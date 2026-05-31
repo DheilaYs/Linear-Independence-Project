@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Independence — Aljabar Linear</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ==============================
+   RESET & ROOT
+============================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0d0f14;
+  --bg2:        #13161e;
+  --bg3:        #1a1e28;
+  --surface:    #1e2330;
+  --surface2:   #252b3a;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.13);
+  --text:       #e8eaf0;
+  --text2:      #9aa0b4;
+  --text3:      #5c6278;
+  --gold:       #c9a84c;
+  --gold2:      #e8c97a;
+  --gold3:      #f5e0a0;
+  --gold-dim:   rgba(201,168,76,0.12);
+  --teal:       #3ecfb2;
+  --teal-dim:   rgba(62,207,178,0.1);
+  --coral:      #e8714a;
+  --coral-dim:  rgba(232,113,74,0.1);
+  --purple:     #9b8df0;
+  --purple-dim: rgba(155,141,240,0.1);
+  --radius:     12px;
+  --radius-lg:  18px;
+  --shadow:     0 8px 40px rgba(0,0,0,0.4);
+  --shadow-sm:  0 2px 16px rgba(0,0,0,0.3);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ==============================
+   BACKGROUND DECORATION
+============================== */
+body::before {
+  content: '';
+  position: fixed;
+  top: -30vh; left: -10vw;
+  width: 60vw; height: 60vh;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20vh; right: -10vw;
+  width: 50vw; height: 50vh;
+  background: radial-gradient(ellipse, rgba(62,207,178,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ==============================
+   NAVIGATION
+============================== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,15,20,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 64px;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; color: var(--gold2); letter-spacing: 0.3px;
+}
+.nav-brand-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.nav-links {
+  display: flex; gap: 4px; list-style: none;
+}
+.nav-links a {
+  text-decoration: none; color: var(--text2); font-size: 13.5px; font-weight: 400;
+  padding: 7px 14px; border-radius: 8px; transition: all 0.2s;
+  position: relative;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text); background: var(--surface);
+}
+.nav-links a.active::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 2px; border-radius: 2px;
+  background: var(--gold);
+}
+
+/* ==============================
+   LAYOUT
+============================== */
+main { padding-top: 64px; position: relative; z-index: 1; }
+
+section {
+  min-height: 100vh;
+  padding: 80px 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+section:not(#hero) { padding-top: 100px; }
+
+/* ==============================
+   HERO
+============================== */
+#hero {
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center; min-height: 100vh;
+  padding: 0 2rem;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11.5px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.25);
+  background: var(--gold-dim); padding: 6px 16px; border-radius: 20px;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 6vw, 72px);
+  font-weight: 700; line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero-title span { color: var(--gold2); }
+.hero-subtitle {
+  font-size: 15px; color: var(--text2); line-height: 1.8;
+  max-width: 520px; margin: 1.2rem auto 2.5rem;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.hero-cta {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.hero-scroll {
+  margin-top: 4rem; color: var(--text3); font-size: 12px;
+  letter-spacing: 1px; text-transform: uppercase;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: fadeUp 0.6s 0.5s ease both;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* Hero cards grid */
+.hero-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  max-width: 600px; margin: 2.5rem auto 0;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.hero-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem;
+  text-align: center; cursor: pointer; transition: all 0.25s;
+}
+.hero-card:hover {
+  border-color: rgba(201,168,76,0.35);
+  background: var(--surface2);
+  transform: translateY(-2px);
+}
+.hero-card-icon { font-size: 22px; margin-bottom: 6px; }
+.hero-card-label { font-size: 12px; color: var(--text2); font-weight: 400; }
+
+/* ==============================
+   BUTTONS
+============================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; border: none;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), #a07830);
+  color: #0d0f14;
+}
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,168,76,0.35); }
+.btn-ghost {
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--surface2); border-color: rgba(201,168,76,0.3); }
+.btn-teal {
+  background: var(--teal-dim); border: 1px solid rgba(62,207,178,0.3);
+  color: var(--teal);
+}
+.btn-teal:hover { background: rgba(62,207,178,0.18); transform: translateY(-1px); }
+.btn-sm { padding: 7px 16px; font-size: 13px; }
+.btn-icon { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 8px; }
+
+/* ==============================
+   SECTION HEADERS
+============================== */
+.section-header { margin-bottom: 2.5rem; }
+.section-eyebrow {
+  font-size: 11px; font-weight: 500; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 4vw, 38px); font-weight: 600; line-height: 1.2;
+  color: var(--text);
+}
+.section-desc {
+  font-size: 14.5px; color: var(--text2); line-height: 1.8; margin-top: 0.75rem;
+  max-width: 560px;
+}
+
+/* ==============================
+   CARDS
+============================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border2); }
+.card-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 0.6rem; }
+.card-body { font-size: 13.5px; color: var(--text2); line-height: 1.75; }
+
+.highlight-box {
+  border-radius: var(--radius); padding: 1.25rem 1.5rem;
+  border-left: 3px solid;
+}
+.highlight-gold { background: var(--gold-dim); border-color: var(--gold); }
+.highlight-gold .hl-label { color: var(--gold); }
+.highlight-gold p, .highlight-gold .hl-text { color: #d4b870; }
+
+.highlight-teal { background: var(--teal-dim); border-color: var(--teal); }
+.highlight-teal .hl-label { color: var(--teal); }
+.highlight-teal p, .highlight-teal .hl-text { color: #6edece; }
+
+.highlight-coral { background: var(--coral-dim); border-color: var(--coral); }
+.highlight-coral .hl-label { color: var(--coral); }
+.highlight-coral p, .highlight-coral .hl-text { color: #e8937a; }
+
+.highlight-purple { background: var(--purple-dim); border-color: var(--purple); }
+.highlight-purple .hl-label { color: var(--purple); }
+.highlight-purple p, .highlight-purple .hl-text { color: #b8aeee; }
+
+.hl-label {
+  font-size: 10.5px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+
+/* ==============================
+   CODE / MATH BLOCKS
+============================== */
+.math-block {
+  font-family: 'DM Mono', monospace; font-size: 13px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem 1.25rem;
+  line-height: 2; overflow-x: auto; color: var(--gold3);
+  white-space: pre; margin: 0.75rem 0;
+}
+.math-inline {
+  font-family: 'DM Mono', monospace; font-size: 12.5px;
+  background: var(--bg3); color: var(--gold2);
+  padding: 2px 7px; border-radius: 5px; border: 1px solid var(--border);
+}
+
+/* ==============================
+   TABS
+============================== */
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.tab {
+  padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 400;
+  cursor: pointer; border: 1px solid transparent; background: none;
+  color: var(--text2); transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+}
+.tab:hover { color: var(--text); background: var(--surface); }
+.tab.active {
+  background: var(--gold-dim); border-color: rgba(201,168,76,0.3);
+  color: var(--gold2); font-weight: 500;
+}
+.tab-panel { display: none; animation: fadeIn 0.25s ease; }
+.tab-panel.active { display: block; }
+
+/* ==============================
+   STEP LIST
+============================== */
+.steps { display: flex; flex-direction: column; gap: 1rem; }
+.step { display: flex; gap: 14px; align-items: flex-start; }
+.step-num {
+  min-width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold2); font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-content p { font-size: 13.5px; color: var(--text2); line-height: 1.7; }
+.step-content strong { color: var(--text); font-weight: 500; }
+
+/* ==============================
+   GRID
+============================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 640px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .hero-cards { grid-template-columns: 1fr; }
+  nav { padding: 0 1rem; }
+  .nav-links { display: none; }
+}
+
+/* ==============================
+   KALKULATOR
+============================== */
+.calc-section { margin-bottom: 1.5rem; }
+.vec-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.vec-label {
+  font-size: 13px; font-weight: 500; color: var(--gold2);
+  font-family: 'DM Mono', monospace; min-width: 28px;
+}
+.vec-input {
+  width: 68px; height: 38px; text-align: center;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-size: 14px;
+  font-family: 'DM Mono', monospace; transition: border-color 0.2s;
+  outline: none;
+}
+.vec-input:focus { border-color: var(--gold); }
+.vec-input::placeholder { color: var(--text3); }
+.input-label {
+  font-size: 11px; color: var(--text3); text-align: center;
+  font-family: 'DM Mono', monospace; display: block; margin-top: 2px;
+}
+.input-group { display: flex; flex-direction: column; }
+
+.calc-result {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+  margin-top: 1rem; display: none;
+}
+.result-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;
+}
+.result-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+}
+.badge-indep { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(62,207,178,0.3); }
+.badge-dep { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(232,113,74,0.3); }
+.result-detail { font-size: 13px; color: var(--text2); line-height: 1.8; }
+
+.steps-popup-trigger {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; color: var(--gold); cursor: pointer;
+  border: 1px solid rgba(201,168,76,0.25); background: var(--gold-dim);
+  padding: 5px 12px; border-radius: 20px; margin-top: 0.75rem;
+  transition: all 0.2s;
+}
+.steps-popup-trigger:hover { background: rgba(201,168,76,0.2); }
+
+/* ==============================
+   CANVAS VISUALISASI
+============================== */
+#vis-canvas {
+  width: 100%; height: 340px; border-radius: var(--radius-lg);
+  border: 1px solid var(--border); background: var(--bg2); display: block;
+  cursor: crosshair;
+}
+.vis-controls { display: flex; gap: 16px; flex-wrap: wrap; margin: 1rem 0; align-items: flex-end; }
+.ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+.ctrl-label { font-size: 11.5px; color: var(--text3); letter-spacing: 0.3px; }
+.ctrl-val { font-size: 13px; font-weight: 500; color: var(--gold2); text-align: center; font-family: 'DM Mono', monospace; }
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 130px; height: 4px; border-radius: 2px;
+  background: var(--surface2); outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--gold); cursor: pointer;
+  border: 2px solid var(--bg); box-shadow: 0 0 0 2px rgba(201,168,76,0.2);
+}
+.vis-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 10px; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+.vis-status {
+  margin-left: auto; font-size: 12.5px; font-weight: 500;
+  padding: 4px 12px; border-radius: 20px;
+}
+
+/* ==============================
+   KUIS
+============================== */
+.quiz-wrapper { max-width: 680px; }
+.quiz-progress-bar { 
+  height: 3px; background: var(--surface2); border-radius: 2px;
+  margin-bottom: 1.5rem; overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--gold), var(--teal));
+  border-radius: 2px; transition: width 0.5s ease;
+}
+.quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.quiz-num { font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+.quiz-score-live { font-size: 12px; color: var(--gold2); font-family: 'DM Mono', monospace; }
+.quiz-q { font-size: 16px; line-height: 1.65; color: var(--text); margin-bottom: 0.75rem; font-weight: 400; }
+.quiz-qmath { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--gold3); background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; line-height: 1.9; display: none; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  padding: 12px 16px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font-size: 13.5px; cursor: pointer;
+  transition: all 0.18s; text-align: left; font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+}
+.quiz-opt:hover:not(:disabled) { border-color: rgba(201,168,76,0.35); background: var(--surface2); }
+.quiz-opt.correct { background: var(--teal-dim); border-color: rgba(62,207,178,0.5); color: var(--teal); }
+.quiz-opt.wrong { background: var(--coral-dim); border-color: rgba(232,113,74,0.5); color: var(--coral); }
+.quiz-opt:disabled { cursor: default; }
+.quiz-feedback {
+  margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 10px;
+  font-size: 13px; line-height: 1.7; display: none;
+}
+.fb-c { background: var(--teal-dim); color: #6edece; border: 1px solid rgba(62,207,178,0.2); }
+.fb-w { background: var(--coral-dim); color: #e8937a; border: 1px solid rgba(232,113,74,0.2); }
+.quiz-footer { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+
+.quiz-result { text-align: center; padding: 3rem 2rem; }
+.score-ring { 
+  width: 100px; height: 100px; margin: 0 auto 1.5rem;
+  border-radius: 50%; background: conic-gradient(var(--gold) var(--pct, 0%), var(--surface2) 0%);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.score-ring::before {
+  content: ''; position: absolute; inset: 6px;
+  border-radius: 50%; background: var(--bg2);
+}
+.score-ring-inner { position: relative; z-index: 1; font-size: 22px; font-weight: 600; color: var(--gold2); font-family: 'Playfair Display', serif; }
+.score-label { font-size: 14px; color: var(--text2); margin-bottom: 0.5rem; }
+.score-msg { font-size: 13.5px; color: var(--text3); max-width: 380px; margin: 0 auto 1.5rem; line-height: 1.7; }
+
+/* ==============================
+   APLIKASI CARDS
+============================== */
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.app-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+}
+.app-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent-line, var(--gold));
+  transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+}
+.app-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+.app-card:hover::before { transform: scaleX(1); }
+.app-card-icon { font-size: 28px; margin-bottom: 1rem; }
+.app-card h4 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.app-card p { font-size: 13px; color: var(--text2); line-height: 1.65; }
+.app-more { 
+  margin-top: 12px; font-size: 12px; color: var(--gold);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ==============================
+   POPUP / MODAL
+============================== */
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.popup-overlay.open { opacity: 1; pointer-events: all; }
+.popup {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2rem; max-width: 620px; width: 100%;
+  max-height: 85vh; overflow-y: auto;
+  transform: translateY(20px) scale(0.97); transition: transform 0.3s;
+  position: relative;
+}
+.popup-overlay.open .popup { transform: translateY(0) scale(1); }
+.popup-close {
+  position: absolute; top: 1.25rem; right: 1.25rem;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text2); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-family: monospace;
+}
+.popup-close:hover { background: var(--coral-dim); color: var(--coral); border-color: var(--coral); }
+.popup-title {
+  font-family: 'Playfair Display', serif; font-size: 20px;
+  color: var(--text); margin-bottom: 0.4rem; padding-right: 2rem;
+}
+.popup-sub { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+
+/* ==============================
+   TOAST NOTIFICATION
+============================== */
+#toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 2000;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 0.75rem 1.25rem;
+  font-size: 13.5px; color: var(--text); box-shadow: var(--shadow);
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.3s; pointer-events: none; max-width: 280px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.toast-success { border-color: rgba(62,207,178,0.4); }
+#toast.toast-error { border-color: rgba(232,113,74,0.4); }
+
+/* ==============================
+   DIVIDER
+============================== */
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+/* ==============================
+   ANIMATIONS
+============================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes scrollPulse {
+  0%,100% { opacity: 0.4; transform: scaleY(0.8); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.fade-up {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* Stagger delays */
+.delay-1 { transition-delay: 0.05s; }
+.delay-2 { transition-delay: 0.1s; }
+.delay-3 { transition-delay: 0.15s; }
+.delay-4 { transition-delay: 0.2s; }
+
+/* ==============================
+   SCROLLBAR
+============================== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+</style>
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-icon">𝕃</div>
+    LinIndep
+  </div>
+  <ul class="nav-links">
+    <li><a href="#hero" class="active" data-section="hero">Beranda</a></li>
+    <li><a href="#materi" data-section="materi">Materi</a></li>
+    <li><a href="#kalkulator" data-section="kalkulator">Kalkulator</a></li>
+    <li><a href="#visualisasi" data-section="visualisasi">Visualisasi</a></li>
+    <li><a href="#kuis" data-section="kuis">Kuis</a></li>
+    <li><a href="#aplikasi" data-section="aplikasi">Aplikasi</a></li>
+  </ul>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section id="hero">
+  <div class="hero-eyebrow">✦ Aljabar Linear · Mini Riset</div>
+  <h1 class="hero-title">Linear<br><span>Independence</span></h1>
+  <p class="hero-subtitle">
+    Eksplorasi interaktif kebebasan linear — dari definisi formal, bukti teorema, hingga aplikasinya dalam dunia nyata.
+  </p>
+  <div class="hero-cta">
+    <a href="#materi" class="btn btn-gold">Mulai Belajar →</a>
+    <button class="btn btn-ghost" onclick="openPopup('popup-about')">Tentang Website</button>
+  </div>
+  <div class="hero-cards">
+    <div class="hero-card" onclick="scrollTo('kalkulator')">
+      <div class="hero-card-icon">⚡</div>
+      <div class="hero-card-label">Kalkulator</div>
+    </div>
+    <div class="hero-card" onclick="scrollTo('visualisasi')">
+      <div class="hero-card-icon">🎯</div>
+      <div class="hero-card-label">Visualisasi</div>
+    </div>
+    <div class="hero-card" onclick="scrollTo('kuis')">
+      <div class="hero-card-icon">✏️</div>
+      <div class="hero-card-label">Kuis</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
+
+<!-- ==================== MATERI ==================== -->
+<section id="materi">
+  <div class="section-header fade-up">
+    <div class="section-eyebrow">01 · Teori & Bukti Formal</div>
+    <h2 class="section-title">Kebebasan Linear</h2>
+    <p class="section-desc">Definisi, teorema, metode pengujian, dan hubungannya dengan basis serta dimensi ruang vektor.</p>
+  </div>
+
+  <div class="tabs fade-up delay-1" id="materi-tabs">
+    <button class="tab active" onclick="switchTab('materi','def')">Definisi</button>
+    <button class="tab" onclick="switchTab('materi','uji')">Cara Menguji</button>
+    <button class="tab" onclick="switchTab('materi','teorema')">Teorema & Bukti</button>
+    <button class="tab" onclick="switchTab('materi','basis')">Basis & Dimensi</button>
+  </div>
+
+  <!-- TAB: Definisi -->
+  <div id="materi-def" class="tab-panel active fade-up delay-2">
+    <div class="highlight-box highlight-gold" style="margin-bottom:1.25rem;">
+      <div class="hl-label">Definisi Formal</div>
+      <p style="font-size:14px;line-height:1.8;">
+        Himpunan vektor <strong style="color:var(--gold2)">{v₁, v₂, …, vₖ}</strong> dalam ruang vektor V disebut
+        <strong style="color:var(--gold2)">bebas linear</strong> jika satu-satunya solusi untuk persamaan berikut adalah solusi trivial:
+      </p>
+    </div>
+    <div class="math-block">c₁·v₁ + c₂·v₂ + · · · + cₖ·vₖ = 0
+⟹  c₁ = c₂ = · · · = cₖ = 0</div>
+    <p style="font-size:13.5px;color:var(--text2);line-height:1.8;margin-bottom:1.25rem;">
+      Jika terdapat skalar <span class="math-inline">cᵢ ≠ 0</span> yang memenuhi persamaan di atas, maka himpunan tersebut
+      <strong style="color:var(--coral)">bergantung linear (linearly dependent)</strong> — artinya minimal satu vektor
+      dapat dinyatakan sebagai kombinasi linear vektor-vektor lain dalam himpunan.
+    </p>
+
+    <div class="grid-2">
+      <div class="card" style="border-top:2px solid var(--teal);">
+        <div class="card-title" style="color:var(--teal);">✓ Bebas Linear</div>
+        <div class="card-body">Tidak ada vektor yang merupakan kombinasi linear dari vektor lainnya. Setiap vektor menambah "dimensi baru".</div>
+        <div class="math-block" style="font-size:12px;margin-top:0.75rem;">v₁=(1,0), v₂=(0,1)
+det = 1·1 − 0·0 = 1 ≠ 0 ✓</div>
+      </div>
+      <div class="card" style="border-top:2px solid var(--coral);">
+        <div class="card-title" style="color:var(--coral);">✗ Bergantung Linear</div>
+        <div class="card-body">Ada vektor yang "redundan" — bisa dibentuk dari kombinasi vektor lain dalam himpunan.</div>
+        <div class="math-block" style="font-size:12px;margin-top:0.75rem;">v₁=(1,2), v₂=(2,4)
+v₂ = 2·v₁  → bergantung!</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+      <div class="card-title" style="margin-bottom:1rem;">Intuisi Geometris</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">ℝ²</div><div class="step-content"><p>Dua vektor bebas linear ⟺ <strong>tidak kolinear</strong>. Mereka menunjuk ke arah yang berbeda dan bisa membentuk seluruh bidang ℝ².</p></div></div>
+        <div class="step"><div class="step-num">ℝ³</div><div class="step-content"><p>Tiga vektor bebas linear ⟺ <strong>tidak koplanar</strong>. Mereka tidak semuanya berbaring di bidang yang sama dan bisa mengisi seluruh ruang ℝ³.</p></div></div>
+        <div class="step"><div class="step-num">ℝⁿ</div><div class="step-content"><p>Maksimal <strong>n vektor bebas linear</strong> dapat ada di ℝⁿ. Lebih dari n vektor di ℝⁿ <em>pasti</em> bergantung linear.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Cara Menguji -->
+  <div id="materi-uji" class="tab-panel">
+    <div class="steps">
+      <div class="step fade-up">
+        <div class="step-num">1</div>
+        <div class="step-content" style="flex:1;">
+          <p><strong>Metode Determinan</strong> — hanya untuk n vektor di ℝⁿ (matriks persegi)</p>
+          <div class="math-block">Susun vektor sebagai kolom → A = [v₁|v₂|···|vₙ]
+det(A) ≠ 0  ⟺  Bebas Linear
+det(A) = 0  ⟺  Bergantung Linear</div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="openPopup('popup-contoh-det')">Lihat Contoh ↗</button>
+        </div>
+      </div>
+      <div class="step fade-up delay-1">
+        <div class="step-num">2</div>
+        <div class="step-content" style="flex:1;">
+          <p><strong>Eliminasi Gauss (Reduksi Baris)</strong> — berlaku umum untuk m×k</p>
+          <div class="math-block">Buat A = [v₁|v₂|···|vₖ], lakukan REF:
+• Hitung rank(A)
+• Bebas linear ⟺ rank(A) = k (semua kolom pivot)
+• Bergantung ⟺ rank(A) < k (ada baris nol)</div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="openPopup('popup-contoh-gauss')">Lihat Contoh ↗</button>
+        </div>
+      </div>
+      <div class="step fade-up delay-2">
+        <div class="step-num">3</div>
+        <div class="step-content" style="flex:1;">
+          <p><strong>Wronskian</strong> — untuk fungsi-fungsi di ruang fungsi</p>
+          <div class="math-block">W(f₁,…,fₙ)(t) = det([[f₁,…,fₙ],[f₁',…,fₙ'],[⋮,⋮,⋮],[f₁⁽ⁿ⁻¹⁾,…,fₙ⁽ⁿ⁻¹⁾]])
+W(t₀) ≠ 0  ⟹  Bebas Linear</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Teorema & Bukti -->
+  <div id="materi-teorema" class="tab-panel">
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="highlight-box highlight-purple fade-up">
+        <div class="hl-label">Teorema 1 — Vektor Nol</div>
+        <p>Himpunan yang memuat vektor nol <strong>selalu bergantung linear</strong>.</p>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="openPopup('popup-bukti1')">Lihat Bukti ↗</button>
+      </div>
+      <div class="highlight-box highlight-gold fade-up delay-1">
+        <div class="hl-label">Teorema 2 — Kelebihan Vektor</div>
+        <p>Jika k &gt; n, maka k vektor di ℝⁿ <strong>pasti bergantung linear</strong>.</p>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="openPopup('popup-bukti2')">Lihat Bukti ↗</button>
+      </div>
+      <div class="highlight-box highlight-teal fade-up delay-2">
+        <div class="hl-label">Teorema 3 — Karakterisasi</div>
+        <p>{v₁,…,vₖ} bergantung linear ⟺ ∃ vⱼ yang merupakan kombinasi linear dari v₁,…,vⱼ₋₁.</p>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="openPopup('popup-bukti3')">Lihat Bukti ↗</button>
+      </div>
+      <div class="highlight-box highlight-coral fade-up delay-3">
+        <div class="hl-label">Teorema 4 — Rank-Nullity</div>
+        <p>Untuk matriks A ukuran m×n: <strong>rank(A) + nullity(A) = n</strong></p>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="openPopup('popup-bukti4')">Lihat Bukti ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Basis & Dimensi -->
+  <div id="materi-basis" class="tab-panel">
+    <div class="highlight-box highlight-gold" style="margin-bottom:1.25rem;">
+      <div class="hl-label">Definisi Basis</div>
+      <p>Himpunan B = {v₁,…,vₙ} adalah <strong>basis</strong> untuk V jika: (1) B bebas linear, dan (2) span(B) = V.</p>
+    </div>
+    <div class="math-block">dim(V) = n  ⟺  Setiap basis V memiliki tepat n vektor
+Bebas linear + n vektor di ℝⁿ  ⟺  Basis ℝⁿ
+rank(A) = n  ⟺  Kolom-kolom A membentuk basis Col(A)</div>
+    <div class="grid-2" style="margin-top:1.25rem;">
+      <div class="card">
+        <div class="card-title">Basis Standar ℝ³</div>
+        <div class="math-block" style="font-size:12px;">e₁=(1,0,0)
+e₂=(0,1,0)
+e₃=(0,0,1)
+det = 1 ≠ 0 ✓</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Basis Polinomial P₂</div>
+        <div class="math-block" style="font-size:12px;">B = {1, t, t²}
+dim(P₂) = 3
+span = p(t), deg ≤ 2</div>
+      </div>
+    </div>
+    <div class="highlight-box highlight-teal" style="margin-top:1.25rem;">
+      <div class="hl-label">Implikasi Penting</div>
+      <p>Kolom-kolom A bebas linear ⟺ Null(A) = {0} ⟺ nullity(A) = 0 ⟺ rank(A) = n (untuk A ukuran m×n).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== KALKULATOR ==================== -->
+<section id="kalkulator">
+  <div class="section-header fade-up">
+    <div class="section-eyebrow">02 · Kalkulator Interaktif</div>
+    <h2 class="section-title">Cek Kebebasan Linear</h2>
+    <p class="section-desc">Masukkan vektor di ℝ² atau ℝ³. Sistem menghitung determinan, eliminasi Gauss, dan rank secara otomatis.</p>
+  </div>
+
+  <div class="tabs fade-up" id="calc-tabs">
+    <button class="tab active" onclick="switchTab('calc','r2')">Vektor di ℝ²</button>
+    <button class="tab" onclick="switchTab('calc','r3')">Vektor di ℝ³</button>
+  </div>
+
+  <!-- R2 -->
+  <div id="calc-r2" class="tab-panel active fade-up delay-1">
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-title" style="margin-bottom:1rem;">Input Vektor (x, y)</div>
+      <div id="r2-vectors">
+        <div class="vec-row" id="r2-row-1">
+          <span class="vec-label">v₁</span>
+          <div class="input-group"><input class="vec-input" id="r2v1x" type="number" value="1" step="any" placeholder="x"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r2v1y" type="number" value="0" step="any" placeholder="y"><span class="input-label">y</span></div>
+        </div>
+        <div class="vec-row" id="r2-row-2">
+          <span class="vec-label">v₂</span>
+          <div class="input-group"><input class="vec-input" id="r2v2x" type="number" value="0" step="any" placeholder="x"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r2v2y" type="number" value="1" step="any" placeholder="y"><span class="input-label">y</span></div>
+        </div>
+        <div class="vec-row" id="r2-row-3" style="display:none;">
+          <span class="vec-label">v₃</span>
+          <div class="input-group"><input class="vec-input" id="r2v3x" type="number" value="1" step="any" placeholder="x"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r2v3y" type="number" value="1" step="any" placeholder="y"><span class="input-label">y</span></div>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="removeV3R2()" title="Hapus v₃">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+        <button class="btn btn-gold btn-sm" onclick="calcR2()">⚡ Hitung</button>
+        <button class="btn btn-ghost btn-sm" id="r2-add-btn" onclick="addV3R2()">+ Tambah v₃</button>
+        <button class="btn btn-ghost btn-sm" onclick="setR2Ex(1)">Contoh dep.</button>
+        <button class="btn btn-ghost btn-sm" onclick="setR2Ex(2)">Contoh bebas</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearR2()">Reset</button>
+      </div>
+    </div>
+    <div id="r2-result" class="calc-result"></div>
+  </div>
+
+  <!-- R3 -->
+  <div id="calc-r3" class="tab-panel fade-up delay-1">
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-title" style="margin-bottom:1rem;">Input Vektor (x, y, z)</div>
+      <div id="r3-vectors">
+        <div class="vec-row">
+          <span class="vec-label">v₁</span>
+          <div class="input-group"><input class="vec-input" id="r3v1x" type="number" value="1" step="any"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v1y" type="number" value="0" step="any"><span class="input-label">y</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v1z" type="number" value="0" step="any"><span class="input-label">z</span></div>
+        </div>
+        <div class="vec-row">
+          <span class="vec-label">v₂</span>
+          <div class="input-group"><input class="vec-input" id="r3v2x" type="number" value="0" step="any"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v2y" type="number" value="1" step="any"><span class="input-label">y</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v2z" type="number" value="0" step="any"><span class="input-label">z</span></div>
+        </div>
+        <div class="vec-row">
+          <span class="vec-label">v₃</span>
+          <div class="input-group"><input class="vec-input" id="r3v3x" type="number" value="0" step="any"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v3y" type="number" value="0" step="any"><span class="input-label">y</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v3z" type="number" value="1" step="any"><span class="input-label">z</span></div>
+        </div>
+        <div class="vec-row" id="r3-row-4" style="display:none;">
+          <span class="vec-label">v₄</span>
+          <div class="input-group"><input class="vec-input" id="r3v4x" type="number" value="1" step="any"><span class="input-label">x</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v4y" type="number" value="1" step="any"><span class="input-label">y</span></div>
+          <div class="input-group"><input class="vec-input" id="r3v4z" type="number" value="1" step="any"><span class="input-label">z</span></div>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="removeV4R3()" title="Hapus v₄">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+        <button class="btn btn-gold btn-sm" onclick="calcR3()">⚡ Hitung</button>
+        <button class="btn btn-ghost btn-sm" id="r3-add-btn" onclick="addV4R3()">+ Tambah v₄</button>
+        <button class="btn btn-ghost btn-sm" onclick="setR3Ex(1)">Contoh dep.</button>
+        <button class="btn btn-ghost btn-sm" onclick="setR3Ex(2)">Contoh bebas</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearR3()">Reset</button>
+      </div>
+    </div>
+    <div id="r3-result" class="calc-result"></div>
+  </div>
+</section>
+
+<!-- ==================== VISUALISASI ==================== -->
+<section id="visualisasi">
+  <div class="section-header fade-up">
+    <div class="section-eyebrow">03 · Visualisasi Interaktif</div>
+    <h2 class="section-title">Lihat Vektor Secara Visual</h2>
+    <p class="section-desc">Putar slider untuk mengubah arah vektor. Amati kapan vektor bebas linear atau kolinear.</p>
+  </div>
+
+  <canvas id="vis-canvas" class="fade-up"></canvas>
+
+  <div class="vis-legend fade-up delay-1">
+    <div class="leg-item"><div class="leg-dot" style="background:#c9a84c;"></div>v₁</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#3ecfb2;"></div>v₂</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#e8714a;"></div>v₃</div>
+    <div id="vis-status" class="vis-status"></div>
+  </div>
+
+  <div class="vis-controls fade-up delay-2">
+    <div class="ctrl-group">
+      <span class="ctrl-label">v₁ · sudut</span>
+      <input type="range" min="0" max="359" value="30" id="ang1" oninput="drawVis()">
+      <span class="ctrl-val" id="ang1-val">30°</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">v₁ · panjang</span>
+      <input type="range" min="0.3" max="1.5" value="1" step="0.05" id="len1" oninput="drawVis()">
+      <span class="ctrl-val" id="len1-val">1.0</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">v₂ · sudut</span>
+      <input type="range" min="0" max="359" value="120" id="ang2" oninput="drawVis()">
+      <span class="ctrl-val" id="ang2-val">120°</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">v₂ · panjang</span>
+      <input type="range" min="0.3" max="1.5" value="1" step="0.05" id="len2" oninput="drawVis()">
+      <span class="ctrl-val" id="len2-val">1.0</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">v₃ · sudut</span>
+      <input type="range" min="0" max="359" value="220" id="ang3" oninput="drawVis()">
+      <span class="ctrl-val" id="ang3-val">220°</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Tampilkan span</span>
+      <input type="range" min="0" max="1" value="0" step="1" id="showspan" oninput="drawVis()">
+      <span class="ctrl-val" id="showspan-val">Off</span>
+    </div>
+  </div>
+
+  <div class="card fade-up delay-3" style="margin-top:1rem;">
+    <div class="card-title">Interpretasi</div>
+    <p id="vis-exp" class="card-body" style="margin-top:0.4rem;">Geser slider untuk melihat hubungan antar vektor. Dua vektor kolinear (bergantung linear) saat sudut mereka sama atau beda 180°.</p>
+  </div>
+</section>
+
+<!-- ==================== KUIS ==================== -->
+<section id="kuis">
+  <div class="section-header fade-up">
+    <div class="section-eyebrow">04 · Latihan Soal</div>
+    <h2 class="section-title">Uji Pemahaman Kamu</h2>
+    <p class="section-desc">10 soal dari konsep dasar hingga bukti formal dan aplikasi dunia nyata.</p>
+  </div>
+
+  <div class="quiz-wrapper fade-up">
+    <div id="quiz-main">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qprog" style="width:0%"></div></div>
+      <div class="quiz-meta">
+        <span class="quiz-num" id="qnum">Soal 1 / 10</span>
+        <span class="quiz-score-live" id="qlive">Skor: 0</span>
+      </div>
+      <div id="qtext" class="quiz-q"></div>
+      <div id="qmath" class="quiz-qmath"></div>
+      <div id="qopts" class="quiz-opts"></div>
+      <div id="qfeedback" class="quiz-feedback"></div>
+      <div class="quiz-footer">
+        <button class="btn btn-gold" id="qnext" onclick="nextQ()" style="display:none;">Soal Berikutnya →</button>
+      </div>
+    </div>
+    <div id="quiz-end" style="display:none;" class="quiz-result">
+      <div class="score-ring" id="score-ring">
+        <div class="score-ring-inner" id="score-inner">0</div>
+      </div>
+      <div class="score-label" id="score-label">dari 10 soal benar</div>
+      <p class="score-msg" id="score-msg"></p>
+      <button class="btn btn-gold" onclick="restartQuiz()">Ulangi Kuis</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== APLIKASI ==================== -->
+<section id="aplikasi">
+  <div class="section-header fade-up">
+    <div class="section-eyebrow">05 · Dunia Nyata</div>
+    <h2 class="section-title">Aplikasi Kebebasan Linear</h2>
+    <p class="section-desc">Konsep ini bukan sekadar teori — ia ada di balik teknologi yang kita gunakan setiap hari.</p>
+  </div>
+
+  <div class="app-grid">
+    <div class="app-card fade-up" style="--accent-line:var(--teal);" onclick="openPopup('app-svd')">
+      <div class="app-card-icon">🖼️</div>
+      <h4>Kompresi Gambar (SVD)</h4>
+      <p>JPEG & PNG menggunakan Singular Value Decomposition dengan basis vektor singular yang bebas linear.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+    <div class="app-card fade-up delay-1" style="--accent-line:var(--purple);" onclick="openPopup('app-pca')">
+      <div class="app-card-icon">🧠</div>
+      <h4>Machine Learning (PCA)</h4>
+      <p>Principal Component Analysis mencari basis bebas linear untuk mereduksi dimensi tanpa kehilangan informasi.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+    <div class="app-card fade-up delay-2" style="--accent-line:var(--gold);" onclick="openPopup('app-fourier')">
+      <div class="app-card-icon">🎵</div>
+      <h4>Pemrosesan Sinyal (FFT)</h4>
+      <p>Fourier Transform menggunakan fungsi sin/cos yang bebas linear sebagai basis — dasar MP3 dan WiFi.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+    <div class="app-card fade-up delay-3" style="--accent-line:var(--coral);" onclick="openPopup('app-qr')">
+      <div class="app-card-icon">📱</div>
+      <h4>QR Code & Kriptografi</h4>
+      <p>Reed-Solomon error correction menggunakan kode linear dengan basis bebas linear di Galois Field.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+    <div class="app-card fade-up" style="--accent-line:#3ecfb2;" onclick="openPopup('app-circuit')">
+      <div class="app-card-icon">⚡</div>
+      <h4>Rangkaian Listrik</h4>
+      <p>Hukum Kirchhoff menghasilkan sistem linear — solusi unik hanya ada jika persamaan bebas linear.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+    <div class="app-card fade-up delay-1" style="--accent-line:var(--purple);" onclick="openPopup('app-3d')">
+      <div class="app-card-icon">🎮</div>
+      <h4>Grafis 3D & Game</h4>
+      <p>Transformasi 3D, rotasi, dan proyeksi perspektif dibangun di atas basis vektor bebas linear.</p>
+      <div class="app-more">Detail ↗</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     POPUPS
+================================================================ -->
+
+<!-- Popup: Tentang Website -->
+<div class="popup-overlay" id="popup-about">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-about')">✕</button>
+    <div class="popup-title">Tentang Website Ini</div>
+    <div class="popup-sub">Mini Riset · Aljabar Linear · Linear Independence</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:1rem;">
+      Website ini dibuat sebagai proyek akhir mata kuliah Aljabar Linear dengan topik <strong style="color:var(--text)">Kebebasan Linear (Linear Independence)</strong>.
+      Tujuannya adalah menyediakan media belajar interaktif yang mencakup teori formal, algoritma, visualisasi, kuis, dan aplikasi nyata.
+    </p>
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div class="card">
+        <div class="card-title">📚 Konten</div>
+        <ul style="font-size:13px;color:var(--text2);line-height:2;padding-left:1.2rem;">
+          <li>Definisi & teorema formal</li>
+          <li>Bukti matematika lengkap</li>
+          <li>3 metode pengujian</li>
+          <li>Kalkulator interaktif</li>
+          <li>Visualisasi vektor</li>
+          <li>10 soal kuis</li>
+          <li>6 aplikasi dunia nyata</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">🛠️ Teknologi</div>
+        <ul style="font-size:13px;color:var(--text2);line-height:2;padding-left:1.2rem;">
+          <li>HTML5 + CSS3</li>
+          <li>Vanilla JavaScript</li>
+          <li>Canvas API (visualisasi)</li>
+          <li>Algoritma Gauss Elimination</li>
+          <li>Algoritma Determinan 3×3</li>
+          <li>Google Fonts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Contoh Determinan -->
+<div class="popup-overlay" id="popup-contoh-det">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-contoh-det')">✕</button>
+    <div class="popup-title">Contoh: Metode Determinan</div>
+    <div class="popup-sub">Uji kebebasan linear menggunakan det(A)</div>
+    <div class="highlight-box highlight-gold" style="margin-bottom:1rem;">
+      <div class="hl-label">Soal</div>
+      <p>Apakah v₁=(1,2), v₂=(3,4) bebas linear di ℝ²?</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p><strong>Susun sebagai matriks:</strong></p><div class="math-block">A = [v₁|v₂] = |1  3|
+               |2  4|</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p><strong>Hitung determinan:</strong></p><div class="math-block">det(A) = (1)(4) − (3)(2)
+       = 4 − 6 = −2</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p><strong>Interpretasi:</strong></p><p>det(A) = −2 ≠ 0, maka v₁ dan v₂ <strong style="color:var(--teal)">bebas linear</strong>. ✓</p></div></div>
+    </div>
+    <div class="highlight-box highlight-coral" style="margin-top:1rem;">
+      <div class="hl-label">Contoh Bergantung</div>
+      <p>Untuk v₁=(1,2), v₂=(2,4): det = 1×4 − 2×2 = 0. Bergantung! (v₂ = 2v₁)</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Contoh Gauss -->
+<div class="popup-overlay" id="popup-contoh-gauss">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-contoh-gauss')">✕</button>
+    <div class="popup-title">Contoh: Eliminasi Gauss</div>
+    <div class="popup-sub">Row Reduction untuk mencari rank</div>
+    <div class="highlight-box highlight-gold" style="margin-bottom:1rem;">
+      <div class="hl-label">Soal</div>
+      <p>Apakah v₁=(1,2,3), v₂=(0,1,2), v₃=(0,0,1) bebas linear di ℝ³?</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p><strong>Bentuk matriks:</strong></p><div class="math-block">A = |1  0  0|
+    |2  1  0|
+    |3  2  1|</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p><strong>Eliminasi → REF:</strong></p><div class="math-block">R₂ ← R₂ − 2R₁:  |0  1  0|
+R₃ ← R₃ − 3R₁:  |0  2  1|
+R₃ ← R₃ − 2R₂:  |0  0  1|
+Hasil: |1  0  0|
+       |0  1  0|
+       |0  0  1|  = I₃</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p><strong>Hitung rank:</strong> rank(A) = 3 = jumlah vektor → <strong style="color:var(--teal)">bebas linear</strong>. ✓</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Bukti 1 -->
+<div class="popup-overlay" id="popup-bukti1">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-bukti1')">✕</button>
+    <div class="popup-title">Bukti Teorema 1</div>
+    <div class="popup-sub">Himpunan berisi vektor nol selalu bergantung linear</div>
+    <div class="highlight-box highlight-purple" style="margin-bottom:1rem;">
+      <div class="hl-label">Pernyataan</div>
+      <p>Jika S = {0, v₁, …, vₖ₋₁}, maka S bergantung linear.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p>Pertimbangkan kombinasi linear: <span class="math-inline">c·0 + 0·v₁ + … + 0·vₖ₋₁ = 0</span></p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p>Kombinasi ini memiliki koefisien <span class="math-inline">c ≠ 0</span> (ambil sembarang c ≠ 0, misalnya c = 1).</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p>Karena terdapat solusi non-trivial untuk <span class="math-inline">Σcᵢvᵢ = 0</span>, maka S <strong style="color:var(--coral)">bergantung linear</strong> menurut definisi. □</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Bukti 2 -->
+<div class="popup-overlay" id="popup-bukti2">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-bukti2')">✕</button>
+    <div class="popup-title">Bukti Teorema 2</div>
+    <div class="popup-sub">k > n vektor di ℝⁿ selalu bergantung linear</div>
+    <div class="highlight-box highlight-gold" style="margin-bottom:1rem;">
+      <div class="hl-label">Pernyataan</div>
+      <p>Jika k &gt; n, maka {v₁,…,vₖ} ⊂ ℝⁿ pasti bergantung linear.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p>Susun vektor sebagai kolom matriks <span class="math-inline">A</span> berukuran <span class="math-inline">n × k</span>.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p>Pertimbangkan sistem homogen <span class="math-inline">Ac = 0</span> di mana <span class="math-inline">c ∈ ℝᵏ</span>. Sistem ini memiliki <span class="math-inline">n</span> persamaan dan <span class="math-inline">k</span> variabel.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p>Karena <span class="math-inline">k > n</span>, jumlah variabel melebihi jumlah persamaan. Oleh Teorema Fundamental Aljabar Linear, sistem ini <strong>pasti memiliki solusi non-trivial</strong> (setidaknya satu variabel bebas).</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><p>Adanya <span class="math-inline">c ≠ 0</span> dengan <span class="math-inline">Ac = 0</span> berarti <span class="math-inline">c₁v₁ + … + cₖvₖ = 0</span> dengan tidak semua cᵢ = 0. Maka himpunan <strong style="color:var(--coral)">bergantung linear</strong>. □</p></div></div>
+    </div>
+    <div class="highlight-box highlight-teal" style="margin-top:1rem;">
+      <div class="hl-label">Implikasi dari Rank-Nullity</div>
+      <p>rank(A) ≤ n &lt; k, sehingga nullity(A) = k − rank(A) ≥ k − n ≥ 1. Ada solusi non-trivial.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Bukti 3 -->
+<div class="popup-overlay" id="popup-bukti3">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-bukti3')">✕</button>
+    <div class="popup-title">Bukti Teorema 3</div>
+    <div class="popup-sub">Karakterisasi bergantung linear</div>
+    <div class="highlight-box highlight-teal" style="margin-bottom:1rem;">
+      <div class="hl-label">Pernyataan (Biimplikasi)</div>
+      <p>{v₁,…,vₖ} bergantung linear ⟺ ∃ j: vⱼ = kombinasi linear dari {v₁,…,vⱼ₋₁}</p>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:1rem;font-weight:500;">(⟹) Arah pertama:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p>Jika bergantung linear, ∃ c ≠ 0 dengan Σᵢcᵢvᵢ = 0.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p>Ambil j = indeks terbesar dengan cⱼ ≠ 0.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p>Maka: <span class="math-inline">cⱼvⱼ = −Σᵢ﹤ⱼ cᵢvᵢ</span></p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><p>Karena cⱼ ≠ 0, bagi kedua sisi: <span class="math-inline">vⱼ = −(1/cⱼ)Σᵢ﹤ⱼ cᵢvᵢ</span>. ✓</p></div></div>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:1rem;font-weight:500;">(⟸) Arah balik:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p>Jika vⱼ = Σᵢ﹤ⱼ aᵢvᵢ, susun ulang: <span class="math-inline">a₁v₁ + … + aⱼ₋₁vⱼ₋₁ − 1·vⱼ = 0</span>.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p>Koefisien vⱼ = −1 ≠ 0, jadi ini solusi non-trivial. Maka bergantung linear. □</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: Bukti 4 -->
+<div class="popup-overlay" id="popup-bukti4">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('popup-bukti4')">✕</button>
+    <div class="popup-title">Teorema Rank-Nullity</div>
+    <div class="popup-sub">Untuk matriks A berukuran m × n</div>
+    <div class="math-block">rank(A) + nullity(A) = n</div>
+    <div class="highlight-box highlight-coral" style="margin-bottom:1rem;">
+      <div class="hl-label">Ide Bukti</div>
+      <p>Misalkan rank(A) = r. Setelah eliminasi Gauss, terdapat r kolom pivot dan (n−r) variabel bebas.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><p>Null(A) = {x ∈ ℝⁿ : Ax = 0}. Setiap solusi ditulis dalam (n−r) parameter bebas.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><p>Setiap variabel bebas memberikan satu vektor basis untuk Null(A).</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><p>Maka nullity(A) = n − r = n − rank(A), sehingga rank + nullity = r + (n−r) = n. □</p></div></div>
+    </div>
+    <div class="highlight-box highlight-gold">
+      <div class="hl-label">Implikasi Utama</div>
+      <p>Kolom A bebas linear ⟺ nullity(A) = 0 ⟺ rank(A) = n ⟺ Ax=0 hanya punya solusi trivial.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App SVD -->
+<div class="popup-overlay" id="app-svd">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-svd')">✕</button>
+    <div class="popup-title">Kompresi Gambar — SVD</div>
+    <div class="popup-sub">Singular Value Decomposition & Linear Independence</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:1rem;">Setiap gambar digital bisa direpresentasikan sebagai matriks intensitas pixel. SVD memfaktorkan matriks ini menjadi komponen-komponen yang saling bebas linear.</p>
+    <div class="math-block">A_{m×n} = U_{m×r} · Σ_{r×r} · Vᵀ_{r×n}
+
+Kolom U: vektor singular kiri (bebas linear, ortonormal)
+Kolom V: vektor singular kanan (bebas linear, ortonormal)
+Σ: nilai singular σ₁ ≥ σ₂ ≥ · · · ≥ σᵣ > 0</div>
+    <div class="highlight-box highlight-teal">
+      <div class="hl-label">Mengapa bebas linear penting?</div>
+      <p>Kolom U dan V yang bebas linear menjamin tidak ada informasi yang tumpang tindih. Rank-k approximation (membuang σ kecil) memberikan kompresi optimal karena setiap komponen membawa informasi unik.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App PCA -->
+<div class="popup-overlay" id="app-pca">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-pca')">✕</button>
+    <div class="popup-title">Machine Learning — PCA</div>
+    <div class="popup-sub">Principal Component Analysis</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:1rem;">PCA mencari arah-arah utama variasi dalam data. Arah-arah ini (principal components) harus bebas linear agar tidak ada informasi redundan.</p>
+    <div class="math-block">Data X ∈ ℝ^{n×p}  (n sampel, p fitur)
+C = (1/n)XᵀX       ← matriks kovarians
+Eigenvectors {v₁,…,vₖ} dari C: bebas linear
+PC₁ = Xv₁,  PC₂ = Xv₂,  …
+PCᵢ ⊥ PCⱼ  untuk i ≠ j  (ortogonal ⟹ bebas linear)</div>
+    <div class="highlight-box highlight-purple">
+      <div class="hl-label">Aplikasi Nyata</div>
+      <p>Pengenalan wajah (Eigenfaces), rekomendasi konten, visualisasi data dimensi tinggi — semuanya mengandalkan principal components yang bebas linear.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App Fourier -->
+<div class="popup-overlay" id="app-fourier">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-fourier')">✕</button>
+    <div class="popup-title">Pemrosesan Sinyal — FFT</div>
+    <div class="popup-sub">Fourier Transform & Basis Ortogonal</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:1rem;">Transformasi Fourier menyatakan sinyal apapun sebagai kombinasi linear dari fungsi sin dan cos. Fungsi-fungsi ini terbukti bebas linear melalui ortogonalitas.</p>
+    <div class="math-block">⟨sin(mt), sin(nt)⟩ = ∫₀²π sin(mt)sin(nt)dt = π·δₘₙ
+⟨cos(mt), cos(nt)⟩ = ∫₀²π cos(mt)cos(nt)dt = π·δₘₙ
+⟨sin(mt), cos(nt)⟩ = 0  untuk semua m,n
+
+Basis Fourier = {1, cos(t), sin(t), cos(2t), sin(2t), …}
+Semua elemen BEBAS LINEAR → rekonstruksi sinyal unik</div>
+    <div class="highlight-box highlight-gold">
+      <div class="hl-label">Mengapa penting?</div>
+      <p>Bebas linear menjamin setiap frekuensi membawa informasi unik — dasar kompresi MP3, transmisi WiFi/4G/5G, dan MRI di dunia medis.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App QR -->
+<div class="popup-overlay" id="app-qr">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-qr')">✕</button>
+    <div class="popup-title">QR Code & Kriptografi</div>
+    <div class="popup-sub">Reed-Solomon & Kode Linear</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:1rem;">Error-correcting codes (QR Code, CD, DNS) menggunakan ruang vektor dengan basis bebas linear untuk mendeteksi dan memperbaiki error.</p>
+    <div class="math-block">Kode linear C ⊂ 𝔽₂ⁿ
+G = generator matrix  (k × n)
+Baris G bebas linear → 2ᵏ codeword unik
+
+Reed-Solomon di GF(2⁸):
+→ Koreksi hingga 30% error (QR Level H)
+→ Baris G bebas linear di atas GF(256)</div>
+    <div class="highlight-box highlight-coral">
+      <div class="hl-label">Contoh nyata</div>
+      <p>Saat HP scan QR code yang lecet/kotor, Reed-Solomon memperbaiki error karena basis bebas linear menjamin setiap codeword dapat direkonstruksi secara unik.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App Circuit -->
+<div class="popup-overlay" id="app-circuit">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-circuit')">✕</button>
+    <div class="popup-title">Rangkaian Listrik</div>
+    <div class="popup-sub">Hukum Kirchhoff & Sistem Linear</div>
+    <div class="math-block">Analisis 3 mesh:
+[R₁₁  R₁₂  R₁₃] [I₁]   [V₁]
+[R₂₁  R₂₂  R₂₃] [I₂] = [V₂]
+[R₃₁  R₃₂  R₃₃] [I₃]   [V₃]
+
+det(R) ≠ 0  ⟺  baris bebas linear
+            ⟺  solusi arus unik ada</div>
+    <div class="highlight-box highlight-teal">
+      <div class="hl-label">Kapan gagal?</div>
+      <p>Jika dua persamaan mesh bergantung linear (redundan), arus tidak bisa ditentukan secara unik. Ini terjadi pada rangkaian yang under-constrained atau memiliki loop ekstra yang tidak independen.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup: App 3D -->
+<div class="popup-overlay" id="app-3d">
+  <div class="popup">
+    <button class="popup-close" onclick="closePopup('app-3d')">✕</button>
+    <div class="popup-title">Grafis 3D & Game Engine</div>
+    <div class="popup-sub">Transformasi Koordinat & Gimbal Lock</div>
+    <div class="math-block">Basis standar ℝ³: {i,j,k} bebas linear
+Rotasi X: Rₓ(θ) = [[1,0,0],[0,cosθ,-sinθ],[0,sinθ,cosθ]]
+det(Rₓ) = 1 ≠ 0 → bebas linear → invertible
+
+Proyeksi perspektif (homogeneous coords):
+P ∈ ℝ^{4×4},  det(P) ≠ 0</div>
+    <div class="highlight-box highlight-purple">
+      <div class="hl-label">Gimbal Lock — Masalah Terkenal</div>
+      <p>Saat dua sumbu rotasi menjadi kolinear (bergantung linear), satu derajat kebebasan hilang. Solusi: quaternion (4D), yang menjaga representasi bebas dari degenerasi linear.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+// ======== NAV ACTIVE STATE ========
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section');
+
+function updateNav() {
+  let cur = '';
+  sections.forEach(s => {
+    const top = s.getBoundingClientRect().top;
+    if (top <= 80) cur = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.dataset.section === cur || (!cur && a.dataset.section === 'hero'));
+  });
+}
+window.addEventListener('scroll', updateNav, { passive: true });
+
+// ======== SCROLL ANIMATION ========
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ======== SMOOTH SCROLL ========
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ======== TABS ========
+function switchTab(group, id) {
+  const panels = document.querySelectorAll(`#${group}-${id}`);
+  document.querySelectorAll(`#${group}-tabs .tab`).forEach(t => t.classList.remove('active'));
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(p => {
+    if (p.classList.contains('tab-panel')) p.classList.remove('active');
+  });
+  const panel = document.getElementById(`${group}-${id}`);
+  if (panel) panel.classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ======== POPUP ========
+function openPopup(id) {
+  document.getElementById(id)?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePopup(id) {
+  document.getElementById(id)?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.popup-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closePopup(overlay.id);
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.popup-overlay.open').forEach(o => closePopup(o.id));
+  }
+});
+
+// ======== TOAST ========
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show toast-${type}`;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// ================================================================
+// KALKULATOR ALGORITMA
+// ================================================================
+
+// --- HELPER: Format number ---
+function fmt(n) {
+  if (Math.abs(n) < 1e-10) return '0';
+  if (Number.isInteger(n)) return String(n);
+  return parseFloat(n.toFixed(4)).toString();
+}
+
+// --- HELPER: Gauss Elimination (returns REF matrix, rank, steps log) ---
+function gaussElim(M) {
+  const m = M.length, n = M[0].length;
+  let mat = M.map(r => [...r]);
+  let rank = 0, pivotCols = [], log = [];
+
+  for (let col = 0; col < n && rank < m; col++) {
+    // find pivot
+    let pivRow = -1;
+    for (let row = rank; row < m; row++) {
+      if (Math.abs(mat[row][col]) > 1e-9) { pivRow = row; break; }
+    }
+    if (pivRow === -1) continue;
+
+    if (pivRow !== rank) {
+      [mat[rank], mat[pivRow]] = [mat[pivRow], mat[rank]];
+      log.push(`R${rank+1} ↔ R${pivRow+1}`);
+    }
+    const piv = mat[rank][col];
+    if (Math.abs(piv - 1) > 1e-9) {
+      const f = fmt(1/piv);
+      for (let j = 0; j < n; j++) mat[rank][j] /= piv;
+      log.push(`R${rank+1} ← (1/${fmt(piv)})·R${rank+1}`);
+    }
+    for (let row = 0; row < m; row++) {
+      if (row !== rank && Math.abs(mat[row][col]) > 1e-9) {
+        const f = mat[row][col];
+        const fs = fmt(f);
+        for (let j = 0; j < n; j++) mat[row][j] -= f * mat[rank][j];
+        log.push(`R${row+1} ← R${row+1} − ${fs}·R${rank+1}`);
+      }
+    }
+    pivotCols.push(col);
+    rank++;
+  }
+  return { mat, rank, log, pivotCols };
+}
+
+// --- HELPER: Det 2x2 ---
+function det2(a,b,c,d) { return a*d - b*c; }
+
+// --- HELPER: Det 3x3 (Sarrus) ---
+function det3(M) {
+  return M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])
+       - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
+       + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+}
+
+// --- HELPER: Render matrix as text ---
+function matStr(mat, label='') {
+  return mat.map((r, i) => (i===0 && label ? label+' = ' : '     ')
+    + '│' + r.map(x => fmt(x).padStart(8)).join(' ') + ' │').join('\n');
+}
+
+// --- HELPER: Result HTML builder ---
+function buildResult(isIndep, det, rank, k, matStr, stepsLog, extraMsg='') {
+  const badge = isIndep
+    ? `<span class="result-badge badge-indep">✓ Bebas Linear</span>`
+    : `<span class="result-badge badge-dep">✗ Bergantung Linear</span>`;
+
+  const stepsHtml = stepsLog.length > 0
+    ? `<div class="steps-popup-trigger" onclick="toggleSteps(this)">▶ Lihat Langkah Eliminasi (${stepsLog.length} operasi)</div>
+       <div class="calc-steps" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+         ${stepsLog.map(s=>`<div style="font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;line-height:2;">${s}</div>`).join('')}
+       </div>`
+    : '';
+
+  return `
+    <div class="result-header">${badge}</div>
+    <div class="result-detail">
+      <strong style="color:var(--text);">Matriks [v₁|v₂|···]:</strong>
+      <div class="math-block" style="font-size:12px;">${matStr}</div>
+      ${det !== null ? `<strong style="color:var(--text);">Determinan:</strong> det(A) = <span style="color:${Math.abs(det)>1e-9?'var(--teal)':'var(--coral)'};font-family:'DM Mono',monospace;">${fmt(det)}</span><br>` : ''}
+      <strong style="color:var(--text);">Rank:</strong> <span style="font-family:'DM Mono',monospace;">${rank}</span> (dari ${k} vektor)<br><br>
+      ${isIndep
+        ? `<span style="color:var(--teal);">✓ </span>Semua ${k} vektor bebas linear. rank = ${k} = jumlah vektor. Setiap vektor menambah dimensi baru dan tidak bisa dibentuk dari yang lain.`
+        : `<span style="color:var(--coral);">✗ </span>Vektor-vektor bergantung linear. rank = ${rank} < ${k}. Ada ${k-rank} vektor yang merupakan kombinasi linear dari vektor lainnya.`
+      }
+      ${extraMsg ? `<br><br><em style="color:var(--text3);font-size:12.5px;">${extraMsg}</em>` : ''}
+      ${stepsHtml}
+    </div>`;
+}
+
+function toggleSteps(el) {
+  const box = el.nextElementSibling;
+  const open = box.style.display === 'block';
+  box.style.display = open ? 'none' : 'block';
+  el.textContent = (open ? '▶' : '▼') + el.textContent.slice(1);
+}
+
+// ======== KALKULATOR R2 ========
+let r2v3 = false;
+
+function addV3R2() {
+  document.getElementById('r2-row-3').style.display = 'flex';
+  document.getElementById('r2-add-btn').style.display = 'none';
+  r2v3 = true;
+}
+function removeV3R2() {
+  document.getElementById('r2-row-3').style.display = 'none';
+  document.getElementById('r2-add-btn').style.display = '';
+  r2v3 = false;
+  document.getElementById('r2-result').style.display = 'none';
+}
+function clearR2() {
+  ['r2v1x','r2v1y','r2v2x','r2v2y','r2v3x','r2v3y'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('r2-result').style.display = 'none';
+}
+function setR2Ex(n) {
+  if (n===1) {
+    document.getElementById('r2v1x').value=1; document.getElementById('r2v1y').value=2;
+    document.getElementById('r2v2x').value=2; document.getElementById('r2v2y').value=4;
+  } else {
+    document.getElementById('r2v1x').value=3; document.getElementById('r2v1y').value=1;
+    document.getElementById('r2v2x').value=-1; document.getElementById('r2v2y').value=2;
+  }
+  r2v3 = false;
+  document.getElementById('r2-row-3').style.display = 'none';
+  document.getElementById('r2-add-btn').style.display = '';
+}
+
+function calcR2() {
+  const v1 = [+document.getElementById('r2v1x').value||0, +document.getElementById('r2v1y').value||0];
+  const v2 = [+document.getElementById('r2v2x').value||0, +document.getElementById('r2v2y').value||0];
+
+  const div = document.getElementById('r2-result');
+  div.style.display = 'block';
+
+  if (!r2v3) {
+    // 2 vectors in R2
+    const d = det2(v1[0],v2[0],v1[1],v2[1]);
+    const isIndep = Math.abs(d) > 1e-9;
+    const M = [[v1[0],v2[0]],[v1[1],v2[1]]];
+    const { rank, log, mat: ref } = gaussElim(M);
+    const ms = `[${fmt(v1[0])}  ${fmt(v2[0])}]
+[${fmt(v1[1])}  ${fmt(v2[1])}]
+
+REF:
+[${fmt(ref[0][0])}  ${fmt(ref[0][1])}]
+[${fmt(ref[1][0])}  ${fmt(ref[1][1])}]`;
+    div.innerHTML = buildResult(isIndep, d, rank, 2, ms, log);
+  } else {
+    // 3 vectors in R2 → always dependent (k=3 > n=2)
+    const v3 = [+document.getElementById('r2v3x').value||0, +document.getElementById('r2v3y').value||0];
+    div.innerHTML = buildResult(false, null, 2, 3,
+      `[${fmt(v1[0])}  ${fmt(v2[0])}  ${fmt(v3[0])}]
+[${fmt(v1[1])}  ${fmt(v2[1])}  ${fmt(v3[1])}]`,
+      [], 'Teorema 2: k=3 > n=2, sehingga ketiga vektor di ℝ² pasti bergantung linear.');
+  }
+}
+
+// ======== KALKULATOR R3 ========
+let r3v4 = false;
+
+function addV4R3() {
+  document.getElementById('r3-row-4').style.display = 'flex';
+  document.getElementById('r3-add-btn').style.display = 'none';
+  r3v4 = true;
+}
+function removeV4R3() {
+  document.getElementById('r3-row-4').style.display = 'none';
+  document.getElementById('r3-add-btn').style.display = '';
+  r3v4 = false;
+  document.getElementById('r3-result').style.display = 'none';
+}
+function clearR3() {
+  ['r3v1x','r3v1y','r3v1z','r3v2x','r3v2y','r3v2z','r3v3x','r3v3y','r3v3z','r3v4x','r3v4y','r3v4z']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('r3-result').style.display='none';
+}
+function setR3Ex(n) {
+  if (n===1) {
+    document.getElementById('r3v1x').value=1; document.getElementById('r3v1y').value=2; document.getElementById('r3v1z').value=3;
+    document.getElementById('r3v2x').value=2; document.getElementById('r3v2y').value=4; document.getElementById('r3v2z').value=6;
+    document.getElementById('r3v3x').value=0; document.getElementById('r3v3y').value=1; document.getElementById('r3v3z').value=2;
+  } else {
+    document.getElementById('r3v1x').value=1; document.getElementById('r3v1y').value=0; document.getElementById('r3v1z').value=0;
+    document.getElementById('r3v2x').value=0; document.getElementById('r3v2y').value=1; document.getElementById('r3v2z').value=0;
+    document.getElementById('r3v3x').value=0; document.getElementById('r3v3y').value=0; document.getElementById('r3v3z').value=1;
+  }
+}
+
+function calcR3() {
+  const v1=[+document.getElementById('r3v1x').value||0,+document.getElementById('r3v1y').value||0,+document.getElementById('r3v1z').value||0];
+  const v2=[+document.getElementById('r3v2x').value||0,+document.getElementById('r3v2y').value||0,+document.getElementById('r3v2z').value||0];
+  const v3=[+document.getElementById('r3v3x').value||0,+document.getElementById('r3v3y').value||0,+document.getElementById('r3v3z').value||0];
+
+  const div = document.getElementById('r3-result');
+  div.style.display = 'block';
+
+  if (!r3v4) {
+    // 3x3 → use det
+    const M3 = [[v1[0],v2[0],v3[0]],[v1[1],v2[1],v3[1]],[v1[2],v2[2],v3[2]]];
+    const d = det3(M3);
+    const isIndep = Math.abs(d) > 1e-9;
+    const { rank, log, mat: ref } = gaussElim(M3.map(r=>[...r]));
+    const ms = `[${fmt(v1[0])}  ${fmt(v2[0])}  ${fmt(v3[0])}]
+[${fmt(v1[1])}  ${fmt(v2[1])}  ${fmt(v3[1])}]
+[${fmt(v1[2])}  ${fmt(v2[2])}  ${fmt(v3[2])}]
+
+Determinan (Sarrus):
+${fmt(v1[0])}(${fmt(v2[1])}·${fmt(v3[2])} − ${fmt(v2[2])}·${fmt(v3[1])}) − ${fmt(v1[1])}(${fmt(v2[0])}·${fmt(v3[2])} − ${fmt(v2[2])}·${fmt(v3[0])}) + ${fmt(v1[2])}(${fmt(v2[0])}·${fmt(v3[1])} − ${fmt(v2[1])}·${fmt(v3[0])}) = ${fmt(d)}
+
+REF:
+[${fmt(ref[0][0])}  ${fmt(ref[0][1])}  ${fmt(ref[0][2])}]
+[${fmt(ref[1][0])}  ${fmt(ref[1][1])}  ${fmt(ref[1][2])}]
+[${fmt(ref[2][0])}  ${fmt(ref[2][1])}  ${fmt(ref[2][2])}]`;
+    div.innerHTML = buildResult(isIndep, d, rank, 3, ms, log);
+  } else {
+    // 4 vectors in R3 → always dependent
+    const v4=[+document.getElementById('r3v4x').value||0,+document.getElementById('r3v4y').value||0,+document.getElementById('r3v4z').value||0];
+    const M4=[[v1[0],v2[0],v3[0],v4[0]],[v1[1],v2[1],v3[1],v4[1]],[v1[2],v2[2],v3[2],v4[2]]];
+    const { rank, log } = gaussElim(M4.map(r=>[...r]));
+    div.innerHTML = buildResult(false, null, rank, 4,
+      `[${fmt(v1[0])}  ${fmt(v2[0])}  ${fmt(v3[0])}  ${fmt(v4[0])}]
+[${fmt(v1[1])}  ${fmt(v2[1])}  ${fmt(v3[1])}  ${fmt(v4[1])}]
+[${fmt(v1[2])}  ${fmt(v2[2])}  ${fmt(v3[2])}  ${fmt(v4[2])}]`, log,
+      'Teorema 2: k=4 > n=3, sehingga keempat vektor di ℝ³ pasti bergantung linear.');
+  }
+}
+
+// ================================================================
+// VISUALISASI CANVAS
+// ================================================================
+function drawVis() {
+  const canvas = document.getElementById('vis-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth, H = 340;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  const cx = W / 2, cy = H / 2;
+  const scale = Math.min(W, H) * 0.3;
+
+  // Background
+  ctx.fillStyle = '#0d1018';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  const gridSpacing = scale / 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 0.5;
+  for (let x = cx % gridSpacing; x < W; x += gridSpacing) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = cy % gridSpacing; y < H; y += gridSpacing) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = '11px DM Mono';
+  ctx.fillText('x', W - 16, cy - 8);
+  ctx.fillText('y', cx + 8, 16);
+
+  // Read values
+  const ang1 = +document.getElementById('ang1').value;
+  const ang2 = +document.getElementById('ang2').value;
+  const ang3 = +document.getElementById('ang3').value;
+  const len1 = +document.getElementById('len1').value;
+  const len2 = +document.getElementById('len2').value;
+  const showSpan = +document.getElementById('showspan').value;
+
+  document.getElementById('ang1-val').textContent = ang1 + '°';
+  document.getElementById('ang2-val').textContent = ang2 + '°';
+  document.getElementById('ang3-val').textContent = ang3 + '°';
+  document.getElementById('len1-val').textContent = len1.toFixed(2);
+  document.getElementById('len2-val').textContent = len2.toFixed(2);
+  document.getElementById('showspan-val').textContent = showSpan ? 'On' : 'Off';
+
+  const toRad = a => a * Math.PI / 180;
+  const vecs = [
+    { a: ang1, l: len1, color: '#c9a84c', lbl: 'v₁' },
+    { a: ang2, l: len2, color: '#3ecfb2', lbl: 'v₂' },
+    { a: ang3, l: 1,    color: '#e8714a', lbl: 'v₃' }
+  ];
+
+  // Compute dx/dy
+  vecs.forEach(v => {
+    v.dx = Math.cos(toRad(v.a));
+    v.dy = -Math.sin(toRad(v.a));
+    v.ex = cx + v.dx * v.l * scale;
+    v.ey = cy + v.dy * v.l * scale;
+  });
+
+  // Check colinearity (angle diff < tol or |diff-180| < tol)
+  function angDiff(a, b) {
+    let d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  }
+  const TOL = 7;
+  const dep12 = angDiff(ang1, ang2) < TOL || Math.abs(angDiff(ang1,ang2) - 180) < TOL;
+  const dep13 = angDiff(ang1, ang3) < TOL || Math.abs(angDiff(ang1,ang3) - 180) < TOL;
+  const dep23 = angDiff(ang2, ang3) < TOL || Math.abs(angDiff(ang2,ang3) - 180) < TOL;
+
+  // Span fill
+  if (showSpan && !dep12) {
+    const v1 = vecs[0], v2 = vecs[1];
+    ctx.fillStyle = 'rgba(62,207,178,0.06)';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Draw colinear warning line
+  if (dep12 || dep13 || dep23) {
+    const pairs = [];
+    if (dep12) pairs.push([vecs[0], vecs[1]]);
+    if (dep13) pairs.push([vecs[0], vecs[2]]);
+    if (dep23) pairs.push([vecs[1], vecs[2]]);
+    pairs.forEach(([a, b]) => {
+      const angle = toRad(a.a);
+      ctx.strokeStyle = 'rgba(232,113,74,0.15)';
+      ctx.lineWidth = 40;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(cx - Math.cos(angle)*W, cy + Math.sin(angle)*W);
+      ctx.lineTo(cx + Math.cos(angle)*W, cy - Math.sin(angle)*W);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    });
+  }
+
+  // Draw arrows
+  function drawArrow(ex, ey, color, lbl) {
+    const angle = Math.atan2(ey - cy, ex - cx);
+    const headLen = 12;
+
+    // Gradient line
+    const grad = ctx.createLinearGradient(cx, cy, ex, ey);
+    grad.addColorStop(0, color + '40');
+    grad.addColorStop(1, color);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+
+    // Arrowhead
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - headLen * Math.cos(angle - 0.38), ey - headLen * Math.sin(angle - 0.38));
+    ctx.lineTo(ex - headLen * Math.cos(angle + 0.38), ey - headLen * Math.sin(angle + 0.38));
+    ctx.closePath();
+    ctx.fill();
+
+    // Label with bg
+    const lx = ex + 16 * Math.cos(angle);
+    const ly = ey + 16 * Math.sin(angle);
+    ctx.font = 'bold 13px DM Mono';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = color;
+    ctx.fillText(lbl, lx, ly);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  vecs.forEach(v => drawArrow(v.ex, v.ey, v.color, v.lbl));
+
+  // Origin dot
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Status & explanation
+  const st = document.getElementById('vis-status');
+  const expEl = document.getElementById('vis-exp');
+  const anyDep = dep12 || dep13 || dep23;
+
+  if (anyDep) {
+    st.textContent = '⚠ Ada yang kolinear';
+    st.style.cssText = 'background:var(--coral-dim);color:var(--coral);border:1px solid rgba(232,113,74,0.3);';
+    let msgs = [];
+    if (dep12) msgs.push('v₁ dan v₂');
+    if (dep13) msgs.push('v₁ dan v₃');
+    if (dep23) msgs.push('v₂ dan v₃');
+    expEl.innerHTML = `<span style="color:var(--coral);">✗ ${msgs.join(', ')} kolinear</span> — bergantung linear! Vektor yang sejajar atau berlawanan arah tidak menambah dimensi baru.`;
+  } else {
+    st.textContent = '✓ Semua pasangan bebas';
+    st.style.cssText = 'background:var(--teal-dim);color:var(--teal);border:1px solid rgba(62,207,178,0.3);';
+    expEl.innerHTML = `<span style="color:var(--teal);">✓ Semua pasangan vektor bebas linear</span> — tidak ada yang kolinear. Catatan: di ℝ², hanya 2 vektor yang benar-benar bebas linear; v₃ tetap bergantung pada span{v₁,v₂} karena dim(ℝ²)=2.`;
+  }
+}
+
+window.addEventListener('resize', drawVis);
+setTimeout(drawVis, 300);
+
+// ================================================================
+// KUIS
+// ================================================================
+const QUIZ = [
+  {
+    q: "Apa syarat perlu dan cukup agar himpunan {v₁,…,vₖ} bebas linear?",
+    math: "c₁v₁ + c₂v₂ + · · · + cₖvₖ = 0",
+    opts: ["c₁=c₂=···=cₖ=0 adalah satu-satunya solusi (solusi trivial)","Minimal satu cᵢ ≠ 0 yang memenuhi persamaan tersebut","Semua vᵢ saling tegak lurus satu sama lain","Determinan matriks yang dibentuk bernilai positif"],
+    ans:0, exp:"Definisi: bebas linear ⟺ solusi persamaan c₁v₁+···+cₖvₖ=0 hanya trivial (semua cᵢ=0). Jika ada cᵢ≠0, himpunan bergantung linear."
+  },
+  {
+    q: "Hitung determinan berikut. Berapa nilainya?",
+    math: "A = [[1, 2],\n     [3, 6]]",
+    opts: ["0","6","−6","12"],
+    ans:0, exp:"det(A) = 1×6 − 2×3 = 6−6 = 0. Kolom bergantung linear — kolom 2 = 2×kolom 1."
+  },
+  {
+    q: "Jika terdapat 5 vektor di ℝ³, apa yang bisa disimpulkan secara langsung?",
+    math: null,
+    opts: ["Pasti bergantung linear (k=5 > n=3)","Mungkin bebas linear jika semua vektor berbeda","Tergantung nilai determinan 5×5-nya","Pasti bebas linear karena berbeda satu sama lain"],
+    ans:0, exp:"Teorema 2: k>n vektor di ℝⁿ pasti bergantung linear. 5>3, sehingga kelima vektor di ℝ³ pasti bergantung linear."
+  },
+  {
+    q: "Vektor v₁=(1,0,0), v₂=(0,1,0), v₃=(1,1,0). Apakah bebas linear di ℝ³?",
+    math: "det([v₁|v₂|v₃]) = ?",
+    opts: ["Tidak — bergantung linear (det=0)","Ya — bebas linear (det≠0)","Tidak bisa ditentukan dari informasi ini","Ya, karena ketiga vektor berbeda"],
+    ans:0, exp:"v₃=v₁+v₂ (kombinasi linear!). det = 1(1·0−0·0)−0+0 = 0. Bergantung linear."
+  },
+  {
+    q: "Rank matriks A = [v₁|v₂|v₃] adalah 2 (dari 3 vektor di ℝ³). Kesimpulannya?",
+    math: "rank([v₁|v₂|v₃]) = 2 < 3",
+    opts: ["Bergantung linear: satu vektor kombinasi linear dua lainnya","Bebas linear karena rank = 2 ≥ 1","Hanya v₃ yang bergantung","Tidak cukup informasi untuk kesimpulan"],
+    ans:0, exp:"Bebas linear ⟺ rank = jumlah vektor. rank=2 < 3, ada 3−2=1 vektor yang redundan."
+  },
+  {
+    q: "Himpunan S = {v₁, v₂, 0} di mana v₁,v₂ bebas linear. S bersifat...",
+    math: null,
+    opts: ["Selalu bergantung linear karena ada vektor nol","Bebas linear jika v₁ dan v₂ tidak nol","Bergantung hanya jika v₁ atau v₂ = 0","Bebas linear karena v₁,v₂ bebas linear"],
+    ans:0, exp:"Teorema 1: himpunan yang memuat vektor nol selalu bergantung linear. Bukti: 1·0+0·v₁+0·v₂=0 adalah solusi non-trivial."
+  },
+  {
+    q: "Mengapa principal components di PCA harus bebas linear (ortogonal)?",
+    math: null,
+    opts: ["Agar setiap komponen membawa informasi unik tanpa redundansi","Agar eigenvalue selalu positif","Agar komputasi bisa dilakukan dengan GPU","Agar data bisa divisualisasikan dalam 3D"],
+    ans:0, exp:"PC ortogonal ⟹ bebas linear. Jika bergantung linear, dua PC memiliki informasi tumpang tindih (redundan) — reduksi dimensi tidak optimal."
+  },
+  {
+    q: "Untuk A berukuran 4×6, berapakah minimum nilai nullity(A)?",
+    math: "rank(A) + nullity(A) = n",
+    opts: ["2 (karena rank ≤ 4 dan n=6, nullity ≥ 6−4=2)","0","4","6"],
+    ans:0, exp:"Rank-Nullity: nullity = n − rank = 6 − rank. rank ≤ min(4,6)=4, sehingga nullity ≥ 6−4=2. Kolom tidak bisa bebas linear."
+  },
+  {
+    q: "Fungsi f₁=eᵗ, f₂=e²ᵗ di ruang fungsi C[ℝ]. Apakah bebas linear?",
+    math: "W(f₁,f₂) = det([[eᵗ, e²ᵗ],[eᵗ, 2e²ᵗ]])",
+    opts: ["Ya — Wronskian = e³ᵗ ≠ 0","Tidak — salah satu adalah turunan dari yang lain","Bergantung interval yang digunakan","Tidak bisa diuji dengan Wronskian untuk fungsi eksponensial"],
+    ans:0, exp:"W = eᵗ·2e²ᵗ − e²ᵗ·eᵗ = 2e³ᵗ − e³ᵗ = e³ᵗ ≠ 0. Wronskian ≠ 0 ⟹ bebas linear."
+  },
+  {
+    q: "Matriks rotasi R(θ) di ℝ² selalu memiliki det(R)=1. Implikasinya?",
+    math: "R(θ)=[[cosθ,−sinθ],[sinθ,cosθ]], det=cos²θ+sin²θ=1",
+    opts: ["Kolom-kolom R selalu bebas linear; rotasi selalu invertible","R tidak invertible saat θ=90°","Kolom bergantung linear saat θ=0°","det=1 tidak berhubungan dengan kebebasan linear"],
+    ans:0, exp:"det(R)=1≠0 untuk semua θ → kolom selalu bebas linear → R selalu invertible. Ini membuktikan rotasi tidak merusak/mengkompresi ruang."
+  }
+];
+
+let qIdx = 0, qScore = 0, qAnswered = false;
+
+function renderQ() {
+  qAnswered = false;
+  const q = QUIZ[qIdx];
+  const pct = (qIdx / QUIZ.length * 100).toFixed(0);
+  document.getElementById('qprog').style.width = pct + '%';
+  document.getElementById('qnum').textContent = `Soal ${qIdx+1} / ${QUIZ.length}`;
+  document.getElementById('qlive').textContent = `Skor: ${qScore}`;
+  document.getElementById('qtext').textContent = q.q;
+  const mathEl = document.getElementById('qmath');
+  if (q.math) { mathEl.style.display = 'block'; mathEl.textContent = q.math; }
+  else mathEl.style.display = 'none';
+  document.getElementById('qopts').innerHTML = q.opts.map((o,i) =>
+    `<button class="quiz-opt" onclick="answerQ(${i})">${String.fromCharCode(65+i)}. ${o}</button>`
+  ).join('');
+  document.getElementById('qfeedback').style.display = 'none';
+  document.getElementById('qnext').style.display = 'none';
+}
+
+function answerQ(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = QUIZ[qIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  opts[q.ans].classList.add('correct');
+  if (i !== q.ans) opts[i].classList.add('wrong');
+  else qScore++;
+  const fb = document.getElementById('qfeedback');
+  fb.style.display = 'block';
+  fb.className = 'quiz-feedback ' + (i === q.ans ? 'fb-c' : 'fb-w');
+  fb.textContent = (i === q.ans ? '✓ Benar! ' : '✗ Salah. ') + q.exp;
+  document.getElementById('qnext').style.display = 'inline-flex';
+  document.getElementById('qlive').textContent = `Skor: ${qScore}`;
+}
+
+function nextQ() {
+  qIdx++;
+  if (qIdx >= QUIZ.length) {
+    document.getElementById('quiz-main').style.display = 'none';
+    document.getElementById('quiz-end').style.display = 'block';
+    const pct = Math.round(qScore / QUIZ.length * 100);
+    document.getElementById('score-ring').style.setProperty('--pct', pct + '%');
+    document.getElementById('score-inner').textContent = qScore + '/' + QUIZ.length;
+    const msgs = [
+      [90,'🎖️ Luar biasa! Pemahaman kamu sangat solid. Siap tugas akhir!'],
+      [70,'👍 Bagus! Review teorema yang keliru dan kamu akan sempurna.'],
+      [50,'📚 Lumayan, tapi perlu latihan lebih. Baca kembali materi teorema.'],
+      [0,'💪 Jangan menyerah! Mulai dari definisi dasar, pelajari pelan-pelan.']
+    ];
+    const msg = msgs.find(([t]) => pct >= t)[1];
+    document.getElementById('score-msg').textContent = msg;
+  } else {
+    renderQ();
+  }
+}
+
+function restartQuiz() {
+  qIdx = 0; qScore = 0;
+  document.getElementById('quiz-main').style.display = 'block';
+  document.getElementById('quiz-end').style.display = 'none';
+  renderQ();
+}
+
+// Init
+renderQ();
+</script>
+</body>
+</html>
